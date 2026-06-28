@@ -11,7 +11,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
 @Tag(name = "Produto", description = "Gerenciamento de produtos")
 @RestController
@@ -23,17 +22,16 @@ public class ProdutoController {
 
     @Operation(summary = "Listar todos os Produto")
     @GetMapping
-    public List<ProdutoResponseDTO> listar(@RequestParam(required = false) String descricao, @RequestParam(required = false) Long clienteId) {
-        List<ProdutoResponseDTO> resultado = service.listar();
-        if (descricao != null && !descricao.isBlank()) {
-            resultado = resultado.stream().filter(item -> item.getDescricao() != null &&
-                item.getDescricao().toLowerCase().contains(descricao.toLowerCase()))
-                .collect(java.util.stream.Collectors.toList());
-        }
+    public ResponseEntity<org.springframework.data.domain.Page<ProdutoResponseDTO>> listar(@RequestParam(required = false) String descricao, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size, @RequestParam(required = false) Long clienteId) {
+        org.springframework.data.domain.Page<ProdutoResponseDTO> resultado = service.listar(descricao, page, size);
         if (clienteId != null) {
-            resultado = resultado.stream().filter(item -> clienteId.equals(item.getClienteId())).collect(java.util.stream.Collectors.toList());
+            java.util.List<ProdutoResponseDTO> filtrado = resultado.getContent().stream()
+                .filter(item -> clienteId.equals(item.getClienteId()))
+                .collect(java.util.stream.Collectors.toList());
+            resultado = new org.springframework.data.domain.PageImpl<>(
+                filtrado, org.springframework.data.domain.PageRequest.of(page, size), filtrado.size());
         }
-        return resultado;
+        return ResponseEntity.ok(resultado);
     }
 
     @Operation(summary = "Buscar Produto por ID")

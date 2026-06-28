@@ -11,12 +11,12 @@ public class ProdutoRequestDTO {
     private String descricao;
     @DecimalMin(value = "0.0", message = "preco não pode ser negativo")
     @NotNull(message = "preco não pode ser nulo")
-    private Double preco;
+    private java.math.BigDecimal preco;
 
     public Long getClienteId() { return clienteId; }
     public void setClienteId(Long clienteId) { this.clienteId = clienteId; }
     public String getDescricao() { return descricao; }
     public void setDescricao(String descricao) { this.descricao = descricao; }
-    public Double getPreco() { return preco; }
-    public void setPreco(Double preco) { this.preco = preco; }
+    public java.math.BigDecimal getPreco() { return preco; }
+    public void setPreco(java.math.BigDecimal preco) { this.preco = preco; }
 }

@@ -12,9 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 @Transactional
 public class ProdutoService {
@@ -29,8 +26,13 @@ public class ProdutoService {
     private ClienteRepository clienteRepository;
 
     @Transactional(readOnly = true)
-    public List<ProdutoResponseDTO> listar() {
-        return repository.findAll().stream().map(mapper::toResponseDTO).collect(Collectors.toList());
+    public org.springframework.data.domain.Page<ProdutoResponseDTO> listar(String descricao, int page, int size) {
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, org.springframework.data.domain.Sort.by("id").descending());
+        if (descricao != null && !descricao.isBlank()) {
+            return repository.findByDescricaoContainingIgnoreCase(descricao, pageable)
+                .map(mapper::toResponseDTO);
+        }
+        return repository.findAll(pageable).map(mapper::toResponseDTO);
     }
 
     @Transactional(readOnly = true)

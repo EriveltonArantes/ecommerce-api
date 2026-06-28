@@ -11,7 +11,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
 @Tag(name = "Pedido", description = "Gerenciamento de pedidos")
 @RestController
@@ -23,15 +22,23 @@ public class PedidoController {
 
     @Operation(summary = "Listar todos os Pedido")
     @GetMapping
-    public List<PedidoResponseDTO> listar(@RequestParam(required = false) Long produtoId, @RequestParam(required = false) Long clienteId) {
-        List<PedidoResponseDTO> resultado = service.listar();
+    public ResponseEntity<org.springframework.data.domain.Page<PedidoResponseDTO>> listar(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size, @RequestParam(required = false) Long produtoId, @RequestParam(required = false) Long clienteId) {
+        org.springframework.data.domain.Page<PedidoResponseDTO> resultado = service.listar(page, size);
         if (produtoId != null) {
-            resultado = resultado.stream().filter(item -> produtoId.equals(item.getProdutoId())).collect(java.util.stream.Collectors.toList());
+            java.util.List<PedidoResponseDTO> filtrado = resultado.getContent().stream()
+                .filter(item -> produtoId.equals(item.getProdutoId()))
+                .collect(java.util.stream.Collectors.toList());
+            resultado = new org.springframework.data.domain.PageImpl<>(
+                filtrado, org.springframework.data.domain.PageRequest.of(page, size), filtrado.size());
         }
         if (clienteId != null) {
-            resultado = resultado.stream().filter(item -> clienteId.equals(item.getClienteId())).collect(java.util.stream.Collectors.toList());
+            java.util.List<PedidoResponseDTO> filtrado = resultado.getContent().stream()
+                .filter(item -> clienteId.equals(item.getClienteId()))
+                .collect(java.util.stream.Collectors.toList());
+            resultado = new org.springframework.data.domain.PageImpl<>(
+                filtrado, org.springframework.data.domain.PageRequest.of(page, size), filtrado.size());
         }
-        return resultado;
+        return ResponseEntity.ok(resultado);
     }
 
     @Operation(summary = "Buscar Pedido por ID")

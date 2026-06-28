@@ -4,4 +4,6 @@ import com.ecommerceapi.model.Produto;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProdutoRepository extends JpaRepository<Produto, Long> {
+
+    org.springframework.data.domain.Page<Produto> findByDescricaoContainingIgnoreCase(String descricao, org.springframework.data.domain.Pageable pageable);
 }

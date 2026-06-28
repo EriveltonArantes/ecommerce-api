@@ -53,7 +53,7 @@ public class SecurityConfig {
             .exceptionHandling(ex -> ex.authenticationEntryPoint(
                 (request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED)))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/h2-console/**", "/swagger-ui/**", "/v3/api-docs/**", "/actuator/health").permitAll()
+                .requestMatchers("/", "/api/auth/**", "/h2-console/**", "/swagger-ui/**", "/v3/api-docs/**", "/actuator/health").permitAll()
                 .anyRequest().authenticated())
             .headers(h -> h.frameOptions(f -> f.disable()))
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

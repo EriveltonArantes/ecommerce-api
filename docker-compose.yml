@@ -1,0 +1,31 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_URL=jdbc:postgresql://db:5432/ecommerceapi
+      - DATABASE_USERNAME=postgres
+      - DATABASE_PASSWORD=postgres
+      - JWT_SECRET=65aecdf22d04662968043520feff338fd232727329ce88b5af310ff0ca2d7b79
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: ecommerceapi
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+volumes:
+  pgdata:

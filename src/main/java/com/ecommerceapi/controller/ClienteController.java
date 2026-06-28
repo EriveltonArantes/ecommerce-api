@@ -11,7 +11,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
 @Tag(name = "Cliente", description = "Gerenciamento de clientes")
 @RestController
@@ -23,14 +22,8 @@ public class ClienteController {
 
     @Operation(summary = "Listar todos os Cliente")
     @GetMapping
-    public List<ClienteResponseDTO> listar(@RequestParam(required = false) String nome) {
-        List<ClienteResponseDTO> resultado = service.listar();
-        if (nome != null && !nome.isBlank()) {
-            resultado = resultado.stream().filter(item -> item.getNome() != null &&
-                item.getNome().toLowerCase().contains(nome.toLowerCase()))
-                .collect(java.util.stream.Collectors.toList());
-        }
-        return resultado;
+    public ResponseEntity<org.springframework.data.domain.Page<ClienteResponseDTO>> listar(@RequestParam(required = false) String nome, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
+        return ResponseEntity.ok(service.listar(nome, page, size));
     }
 
     @Operation(summary = "Buscar Cliente por ID")

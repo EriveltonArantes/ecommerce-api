@@ -1,7 +1,7 @@
 package com.ecommerceapi.controller;
 
-import com.ecommerceapi.model.Usuario;
-import com.ecommerceapi.repository.UsuarioRepository;
+import com.ecommerceapi.model.UsuarioSistema;
+import com.ecommerceapi.repository.UsuarioSistemaRepository;
 import com.ecommerceapi.security.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,7 +20,7 @@ import java.util.Optional;
 public class AuthController {
 
     @Autowired
-    private UsuarioRepository repository;
+    private UsuarioSistemaRepository repository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -30,29 +30,29 @@ public class AuthController {
 
     @Operation(summary = "Registrar novo usuário")
     @PostMapping("/registrar")
-    public ResponseEntity<Map<String, String>> registrar(@RequestBody Usuario usuario) {
-        if (usuario.getUsername() == null || usuario.getUsername().isBlank()
-                || usuario.getPassword() == null || usuario.getPassword().isBlank()) {
+    public ResponseEntity<Map<String, String>> registrar(@RequestBody UsuarioSistema usuarioSistema) {
+        if (usuarioSistema.getUsername() == null || usuarioSistema.getUsername().isBlank()
+                || usuarioSistema.getPassword() == null || usuarioSistema.getPassword().isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(Map.of("erro", "username e password são obrigatórios"));
         }
-        if (repository.findByUsername(usuario.getUsername()).isPresent()) {
+        if (repository.findByUsername(usuarioSistema.getUsername()).isPresent()) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Map.of("erro", "Usuário já existe"));
         }
-        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
-        if (usuario.getRole() == null || usuario.getRole().isBlank()) {
-            usuario.setRole("USER");
+        usuarioSistema.setPassword(passwordEncoder.encode(usuarioSistema.getPassword()));
+        if (usuarioSistema.getRole() == null || usuarioSistema.getRole().isBlank()) {
+            usuarioSistema.setRole("USER");
         }
-        repository.save(usuario);
+        repository.save(usuarioSistema);
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(Map.of("mensagem", "Usuário registrado com sucesso"));
     }
 
     @Operation(summary = "Login — retorna token JWT")
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody Usuario login) {
-        Optional<Usuario> existente = repository.findByUsername(login.getUsername());
+    public ResponseEntity<Map<String, String>> login(@RequestBody UsuarioSistema login) {
+        Optional<UsuarioSistema> existente = repository.findByUsername(login.getUsername());
         if (existente.isEmpty() || !passwordEncoder.matches(login.getPassword(), existente.get().getPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(Map.of("erro", "Usuário ou senha inválidos"));

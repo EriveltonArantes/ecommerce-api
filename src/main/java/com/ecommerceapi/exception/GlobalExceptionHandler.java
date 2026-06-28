@@ -24,6 +24,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<Map<String, Object>> handleBusiness(BusinessException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.CONFLICT.value());
+        body.put("erro", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+    }
+
     // Bug real (2026-06-22): rota sem mapeamento (ex.: acessar "/" direto
     // na API, sem ser /api/algo) lança NoResourceFoundException — o Spring
     // já devolveria 404 sozinho, mas o catch-all Exception abaixo capturava

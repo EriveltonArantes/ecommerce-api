@@ -10,7 +10,7 @@ public class PedidoRequestDTO {
     @NotNull(message = "ClienteId é obrigatório")
     @Positive(message = "ClienteId deve ser um ID válido (positivo)")
     private Long clienteId;
-    @NotNull(message = "data não pode ser nulo")
+
     private java.time.LocalDateTime data;
     @NotBlank(message = "status não pode estar em branco")
     private String status;
